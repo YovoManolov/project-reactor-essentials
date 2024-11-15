@@ -123,15 +123,41 @@ public class MonoTest {
                 ()->log.info("FINISHED!"),
                 subscription -> subscription.request(5)
         );
+    }
 
-        //StepVerifier.create(mono).expectNext(name.toUpperCase()).verifyComplete();
+    @Test
+    public void monoDoOnError() {
 
+        String name = "William Suane";
+        Mono<Object> error = Mono.error(new IllegalArgumentException("Illeagal argument exception"))
+                .onErrorReturn("EMPTY")
+                .onErrorResume(s-> {
+                    log.info("Inside on error resume");
+                    return Mono.just(name);
+                })
+                .doOnError(
+                        e-> MonoTest.log.error("Error message: {}", e.getMessage())).log();
+
+
+        StepVerifier.create(error).expectNext("EMPTY").verifyComplete();
     }
 
 
+    @Test
+    public void monoDoOnErrorResume() {
+
+        String name = "William Suane";
+        Mono<Object> error = Mono.error(new IllegalArgumentException("Illeagal argument exception"))
+                .onErrorResume(s-> {
+                    log.info("Inside on error resume");
+                    return Mono.just(name);
+                })
+                .onErrorReturn("EMPTY")
+                .doOnError(
+                        e-> MonoTest.log.error("Error message: {}", e.getMessage())).log();
 
 
-
-
+        StepVerifier.create(error).expectNext(name).verifyComplete();
+    }
 
 }
