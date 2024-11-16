@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@Slf4j
-
 /**
  *
  * Reactive Streams
@@ -23,7 +21,7 @@ import reactor.test.StepVerifier;
  * 2. Publisher sends all the objects it has. (onComplete) subscriber and subscription will be canceled
  * 3. There is an error. (onError) -> subscriber and subscription will be canceled
  */
-
+@Slf4j
 public class MonoTest {
 
     @Test
@@ -61,11 +59,11 @@ public class MonoTest {
     @Test
     public void monoSubscriberConsumerError(){
         String name = "William Suane";
-        Mono<String> mono = Mono.just(name).map(s -> {
+        Mono<String> mono = Mono.just(name).map(_ -> {
             throw new RuntimeException("Testing Mono with error");
         });
 
-        mono.subscribe(s -> log.info("Name: {}", s), s-> log.error("Something bad happend"));
+        mono.subscribe(s -> log.info("Name: {}", s), _-> log.error("Something bad happend"));
         mono.subscribe(s -> log.info("Name: {}", s), Throwable::printStackTrace);
 
         log.info("----------------------------------");
@@ -109,10 +107,10 @@ public class MonoTest {
         Mono<Object> mono = Mono.just(name)
                 .log()
                 .map(String::toUpperCase)
-                .doOnSubscribe(subscription -> log.info("Subscribed"))
-                .doOnRequest(longNumber -> log.info("Request received, starting doing something..."))
+                .doOnSubscribe(_ -> log.info("Subscribed"))
+                .doOnRequest(_ -> log.info("Request received, starting doing something..."))
                 .doOnNext(s -> log.info("Value is here. Executing doOnNext {}", s))
-                .flatMap(s -> Mono.empty())
+                .flatMap(_ -> Mono.empty())
                 .doOnNext(s -> log.info("Value is here. Executing doOnNext {}", s)) //this will not be executed
                 .doOnSuccess(s -> log.info("doOnSuccess executed {}", s));
 
@@ -130,7 +128,7 @@ public class MonoTest {
         String name = "William Suane";
         Mono<Object> error = Mono.error(new IllegalArgumentException("Illeagal argument exception"))
                 .onErrorReturn("EMPTY")
-                .onErrorResume(s-> {
+                .onErrorResume(_-> {
                     log.info("Inside on error resume");
                     return Mono.just(name);
                 })
@@ -147,7 +145,7 @@ public class MonoTest {
 
         String name = "William Suane";
         Mono<Object> error = Mono.error(new IllegalArgumentException("Illeagal argument exception"))
-                .onErrorResume(s-> {
+                .onErrorResume(_-> {
                     log.info("Inside on error resume");
                     return Mono.just(name);
                 })
