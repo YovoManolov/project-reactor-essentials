@@ -3,6 +3,8 @@ package academy.dev.dojo.reactive.test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -150,5 +152,44 @@ public class OperatorsTest {
               return true;
             })
         .verifyComplete();
+  }
+
+  @Test
+  public void switchIfEmpty() {
+    Flux<Object> flux = emptyFlux().switchIfEmpty(Flux.just("not empty anymore")).log();
+
+    StepVerifier.create(flux)
+        .expectSubscription()
+        .expectNext("not empty anymore")
+        .expectComplete()
+        .verify();
+  }
+
+  @Test
+  public void deferOperator() throws Exception {
+    Mono<Long> just =
+        // Create a new Mono that emits the specified item, which is captured at instantiation time.
+        Mono.just(System.currentTimeMillis());
+
+    Mono<Long> defer =
+        // Create a Mono provider that will supply a target Mono to subscribe to for each Subscriber
+        // downstream.
+        Mono.defer(() -> Mono.just(System.currentTimeMillis()));
+
+    defer.subscribe(l -> log.info("time {}", l));
+    Thread.sleep(100);
+    defer.subscribe(l -> log.info("time {}", l));
+    Thread.sleep(100);
+    defer.subscribe(l -> log.info("time {}", l));
+    Thread.sleep(100);
+    defer.subscribe(l -> log.info("time {}", l));
+
+    AtomicLong atomicLong = new AtomicLong();
+    defer.subscribe(atomicLong::set);
+    Assertions.assertTrue(atomicLong.get() > 0);
+  }
+
+  private Flux<Object> emptyFlux() {
+    return Flux.empty();
   }
 }
