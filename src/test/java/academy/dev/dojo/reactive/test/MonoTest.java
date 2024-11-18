@@ -24,6 +24,36 @@ import reactor.test.StepVerifier;
 @Slf4j
 public class MonoTest {
 
+//    @BeforeAll
+//    public static void setUp(){
+//        BlockHound.install();
+//
+//    }
+//
+//    @BeforeAll
+//    public static void setUp(){
+//        BlockHound.install(builder -> builder.allowBlockingCallsInside("org.slf4j.impl.SimpleLogger","write"));
+//    }
+//
+//    @Test
+//    public void blockHoundWorks(){
+//        try{
+//            Mono.delay(Duration.ofSeconds(1))
+//                    .doOnNext(_ -> {
+//                        try {
+//                            Thread.sleep(10);
+//                        }
+//                        catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    })
+//                    .block();
+//        } catch (Exception e) {
+//            Assertions.assertInstanceOf(BlockingOperationError.class, e.getCause());
+//        }
+//
+//    }
+
     @Test
     public void monoSubscriber(){
         String name = "William Suane";
